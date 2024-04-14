@@ -10,8 +10,9 @@ import { CustomButton, Loading, TextInput } from "../components";
 import { BgImage } from "../assets";
 import { UserLogin } from "../redux/userSlice";
 import { apiRequest } from "../utils";
-
+import { useNavigate } from "react-router-dom";
 const Login = () => {
+  const navigate=useNavigate();
   const [errMsg, setErrMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch();
@@ -25,6 +26,7 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
+    
     setIsSubmitting(true);
     try {
       const res = await apiRequest({
@@ -33,16 +35,19 @@ const Login = () => {
         data: data,
       });
 
-      console.log(res);
+
+     
       if (res?.status === "failed") {
         setErrMsg(res);
       } else {
         setErrMsg("");
 
-        const newData = { token: res?.token, ...res?.user };
-        console.log(newData);
+        const data=JSON.parse(res);
+        
+        const newData = { token: data?.token, ...data?.user };
+        
         dispatch(UserLogin(newData));
-        window.location.replace("/");
+        navigate("/");
       }
       setIsSubmitting(false);
     } catch (error) {
@@ -50,6 +55,8 @@ const Login = () => {
       console.log("error in login page", error);
     }
   };
+
+
 
   return (
     <div className="bg-bgColor w-full h-[100vh] flex items-center justify-center p-6">

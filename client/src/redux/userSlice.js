@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { user } from "../assets/data";
 
 const initialState = {
-  user: JSON.parse(window?.localStorage.getItem("user")) ?? {},
+  user:  {},
   edit: false,
 };
 
@@ -12,7 +12,7 @@ const userSlice = createSlice({
   reducers: {
     login(state, action) {
       state.user = action.payload;
-      localStorage.setItem("user", JSON.stringify(action.payload));
+      localStorage.setItem("user",JSON.stringify(action.payload));
     },
     logout(state) {
       state.user = null;
@@ -27,7 +27,7 @@ export default userSlice.reducer;
 
 export function UserLogin(user) {
   return (dispatch, getState) => {
-    dispatch(userSlice.actions.login({ user }));
+    dispatch(userSlice.actions.login( user ));
   };
 }
 

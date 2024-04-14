@@ -8,17 +8,17 @@ export const API = axios.create({
   responseType: "JSON",
 });
 
-export const apiRequest = ({ url, token, data, method }) => {
+export const apiRequest = async({ url, token, data, method }) => {
   try {
-    const result = API(url, {
+    const result = await API(url, {
       headers: {
         "Content-Type": "application/json",
         Authorization: token ? `Bearer ${token}` : "",
       },
       method: method || "GET",
-      data: data,
+      data : data,
     });
-    return result;
+    return result?.data;
   } catch (error) {
     const err = error.data;
     console.log(err);
@@ -49,7 +49,7 @@ export const handelFileUpload = async (uploadFile) => {
   }
 };
 
-export const fetchPost = async (token, dispatch, uri, data) => {
+export const fetchPosts = async (token, dispatch, uri, data) => {
   try {
     const res = await apiRequest({
       url: uri || "/posts",

@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import TextInput from "./TextInput";
 import Loading from "./Loading";
 import CustomButton from "./CustomButton";
-import { UpdateProfile } from "../redux/userSlice";
+import { UpdateProfile, UserLogin } from "../redux/userSlice";
+import { apiRequest, handelFileUpload } from "../utils";
 
 const EditProfile = () => {
   const { user } = useSelector((state) => state.user);
@@ -23,8 +24,46 @@ const EditProfile = () => {
     defaultValues: { ...user },
   });
 
-  const onSubmit = async (data) => {};
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    setErrMsg("");
+    try {
+      const uri = picture && (await handelFileUpload(picture));
+      const { firstName, lastName, location, profession } = data;
+      console.log(user);
+      const res = await apiRequest({
+        method: "PUT",
+        url: "/users/update-user",
+        data: {
+          firstName,
+          lastName,
+          location, 
+          profession,
+          profileUrl: uri ? uri : user?.profileUrl,
+        },
+        token: user?.token,
+      });
+      console.log(res);
 
+      console.log(res);
+      if (res?.status === "failed") {
+        setErrMsg(res);
+      } else {
+        const newUser = { token: res?.token, ...res?.user };
+
+        // dispatch(UserLogin(newUser));
+
+        setTimeout(() => {
+          dispatch(UpdateProfile(false));
+        }, 3000);
+        setErrMsg("");
+      }
+      setIsSubmitting(false);
+    } catch (error) {
+      console.log("error in EditProfile.jsx :", error);
+      setIsSubmitting(false);
+    }
+  };
   const handleClose = () => {
     dispatch(UpdateProfile(false));
   };
@@ -34,41 +73,41 @@ const EditProfile = () => {
 
   return (
     <>
-      <div className='fixed z-50 inset-0 overflow-y-auto'>
-        <div className='flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0'>
-          <div className='fixed inset-0 transition-opacity'>
-            <div className='absolute inset-0 bg-[#000] opacity-70'></div>
+      <div className="fixed z-50 inset-0 overflow-y-auto">
+        <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div className="fixed inset-0 transition-opacity">
+            <div className="absolute inset-0 bg-[#000] opacity-70"></div>
           </div>
-          <span className='hidden sm:inline-block sm:align-middle sm:h-screen'></span>
+          <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
           &#8203;
           <div
-            className='inline-block align-bottom bg-primary rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full'
-            role='dialog'
-            aria-modal='true'
-            aria-labelledby='modal-headline'
+            className="inline-block align-bottom bg-primary rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-headline"
           >
-            <div className='flex justify-between px-6 pt-5 pb-2'>
+            <div className="flex justify-between px-6 pt-5 pb-2">
               <label
-                htmlFor='name'
-                className='block font-medium text-xl text-ascent-1 text-left'
+                htmlFor="name"
+                className="block font-medium text-xl text-ascent-1 text-left"
               >
                 Edit Profile
               </label>
 
-              <button className='text-ascent-1' onClick={handleClose}>
+              <button className="text-ascent-1" onClick={handleClose}>
                 <MdClose size={22} />
               </button>
             </div>
             <form
-              className='px-4 sm:px-6 flex flex-col gap-3 2xl:gap-6'
+              className="px-4 sm:px-6 flex flex-col gap-3 2xl:gap-6"
               onSubmit={handleSubmit(onSubmit)}
             >
               <TextInput
-                name='firstName'
-                label='First Name'
-                placeholder='First Name'
-                type='text'
-                styles='w-full'
+                name="firstName"
+                label="First Name"
+                placeholder="First Name"
+                type="text"
+                styles="w-full"
                 register={register("firstName", {
                   required: "First Name is required!",
                 })}
@@ -76,10 +115,10 @@ const EditProfile = () => {
               />
 
               <TextInput
-                label='Last Name'
-                placeholder='Last Name'
-                type='lastName'
-                styles='w-full'
+                label="Last Name"
+                placeholder="Last Name"
+                type="lastName"
+                styles="w-full"
                 register={register("lastName", {
                   required: "Last Name do no match",
                 })}
@@ -87,11 +126,11 @@ const EditProfile = () => {
               />
 
               <TextInput
-                name='profession'
-                label='Profession'
-                placeholder='Profession'
-                type='text'
-                styles='w-full'
+                name="profession"
+                label="Profession"
+                placeholder="Profession"
+                type="text"
+                styles="w-full"
                 register={register("profession", {
                   required: "Profession is required!",
                 })}
@@ -99,10 +138,10 @@ const EditProfile = () => {
               />
 
               <TextInput
-                label='Location'
-                placeholder='Location'
-                type='text'
-                styles='w-full'
+                label="Location"
+                placeholder="Location"
+                type="text"
+                styles="w-full"
                 register={register("location", {
                   required: "Location do no match",
                 })}
@@ -110,21 +149,21 @@ const EditProfile = () => {
               />
 
               <label
-                className='flex items-center gap-1 text-base text-ascent-2 hover:text-ascent-1 cursor-pointer my-4'
-                htmlFor='imgUpload'
+                className="flex items-center gap-1 text-base text-ascent-2 hover:text-ascent-1 cursor-pointer my-4"
+                htmlFor="imgUpload"
               >
                 <input
-                  type='file'
-                  className=''
-                  id='imgUpload'
+                  type="file"
+                  className=""
+                  id="imgUpload"
                   onChange={(e) => handleSelect(e)}
-                  accept='.jpg, .png, .jpeg'
+                  accept=".jpg, .png, .jpeg"
                 />
               </label>
 
               {errMsg?.message && (
                 <span
-                  role='alert'
+                  role="alert"
                   className={`text-sm ${
                     errMsg?.status === "failed"
                       ? "text-[#f64949fe]"
@@ -135,14 +174,14 @@ const EditProfile = () => {
                 </span>
               )}
 
-              <div className='py-5 sm:flex sm:flex-row-reverse border-t border-[#66666645]'>
+              <div className="py-5 sm:flex sm:flex-row-reverse border-t border-[#66666645]">
                 {isSubmitting ? (
                   <Loading />
                 ) : (
                   <CustomButton
-                    type='submit'
+                    type="submit"
                     containerStyles={`inline-flex justify-center rounded-md bg-blue px-8 py-3 text-sm font-medium text-white outline-none`}
-                    title='Submit'
+                    title="Submit"
                   />
                 )}
               </div>
