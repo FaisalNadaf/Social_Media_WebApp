@@ -4,10 +4,8 @@ import Users from "../models/userModel.js";
 
 export const createPost = async (req, res, next) => {
   try {
-    console.log(req.body.user);
     // const { userId } = req.body.user;
-    const userId = req.body.user?.userId;
-    console.log(userId);
+    const userId = req.body.user?._id;
     const { description, image } = req.body;
 
     if (!description) {
@@ -56,6 +54,8 @@ export const getPosts = async (req, res, next) => {
       })
       .sort({ _id: -1 });
 
+    console.log(posts);
+
     const friendsPosts = posts?.filter((post) => {
       return friends.includes(post?.userId?._id.toString());
     });
@@ -87,30 +87,32 @@ export const getPost = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const post = await Posts.findById(id).populate({
-      path: "userId",
-      select: "firstName lastName location profileUrl -password",
-    });
-    // .populate({
-    //   path: "comments",
-    //   populate: {
-    //     path: "userId",
-    //     select: "firstName lastName location profileUrl -password",
-    //   },
-    //   options: {
-    //     sort: "-_id",
-    //   },
-    // })
-    // .populate({
-    //   path: "comments",
-    //   populate: {
-    //     path: "replies.userId",
-    //     select: "firstName lastName location profileUrl -password",
-    //   },
-    // });
+    const post = await Posts.findById(id)
+      .populate({
+        path: "userId",
+        select: "firstName lastName location profileUrl -password",
+      })
+      .populate({
+        path: "comments",
+        populate: {
+          path: "userId",
+          select: "firstName lastName location profileUrl -password",
+        },
+        options: {
+          sort: "-_id",
+        },
+      })
+      .populate({
+        path: "comments",
+        populate: {
+          path: "replies.userId",
+          select: "firstName lastName location profileUrl -password",
+        },
+      });
 
     res.status(200).json({
       sucess: true,
+
       message: "successfully",
       data: post,
     });
@@ -279,7 +281,6 @@ export const commentPost = async (req, res, next) => {
     const post = await Posts.findById(id);
 
     post.comments.push(newComment._id);
-
     const updatedPost = await Posts.findByIdAndUpdate(id, post, {
       new: true,
     });

@@ -28,8 +28,9 @@ import {
 import { UserLogin } from "../redux/userSlice";
 
 const Home = () => {
-  const { user, edit } = useSelector((state) => state.user);
-  const posts = useSelector((state) => state.post);
+  const { edit } = useSelector((state) => state.user);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const { posts } = useSelector((state) => state.posts);
   const [friendRequest, setFriendRequest] = useState([]);
   const [suggestedFriends, setSuggestedFriends] = useState([]);
   const [errMsg, setErrMsg] = useState("");
@@ -58,7 +59,6 @@ const Home = () => {
         data: newData,
         token: user?.token,
       });
-      console.log(res);
       if (res?.status === "failed") {
         setErrMsg(res);
       } else {
@@ -75,7 +75,6 @@ const Home = () => {
       setPosting(false);
     }
   };
-
   const fetchPost = async () => {
     await fetchPosts(user?.token, dispatch);
     setLoading(false);
@@ -103,7 +102,7 @@ const Home = () => {
   const fetchsuggestedFriends = async () => {
     try {
       const res = await apiRequest({
-        url: "/users/get-suggested-friends",
+        url: "/users/suggested-friends",
         token: user?.token,
         method: "POST",
       });
@@ -136,9 +135,8 @@ const Home = () => {
   const getUsers = async () => {
     const res = await getUserInfo(user?.token);
     const newData = { token: user?.token, ...res };
-    dispatch(UserLogin(newData))
+    dispatch(UserLogin(newData));
   };
-
   useEffect(() => {
     fetchFrienduesReqests();
     fetchsuggestedFriends();

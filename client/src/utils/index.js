@@ -8,7 +8,7 @@ export const API = axios.create({
   responseType: "JSON",
 });
 
-export const apiRequest = async({ url, token, data, method }) => {
+export const apiRequest = async ({ url, token, data, method }) => {
   try {
     const result = await API(url, {
       headers: {
@@ -16,12 +16,16 @@ export const apiRequest = async({ url, token, data, method }) => {
         Authorization: token ? `Bearer ${token}` : "",
       },
       method: method || "GET",
-      data : data,
+      data: data,
+      withCredentials: true,
     });
-    return result?.data;
+    const newdata = result?.data;
+
+    return JSON.parse(newdata);
+    // return newdata;
   } catch (error) {
-    const err = error.data;
-    console.log(err);
+    // const err = error.data;
+    console.log(error);
   }
 };
 
@@ -31,13 +35,14 @@ export const handelFileUpload = async (uploadFile) => {
   formData.append("upload_present", "MEkMATE");
 
   try {
-    const cloudName = process.env.CLOUD_NAME; // Check if CLOUD_NAME is properly set
+    const cloudName = "dcacqhspd"; // Check if CLOUD_NAME is properly set
+
     if (!cloudName) {
       throw new Error("CLOUD_NAME environment variable is not set.");
     }
 
     const response = await axios.post(
-      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload/`,
+      `https://api.cloudinary.com/v1_1/dcacqhspd/image/upload/`,
       formData
     );
 
@@ -111,7 +116,7 @@ export const getUserInfo = async (token, id) => {
   }
 };
 
-export const sendFriendRequest = async ({ token, id }) => {
+export const sendFriendRequest = async ( token, id ) => {
   try {
     const res = await apiRequest({
       url: "/users/friend-request",

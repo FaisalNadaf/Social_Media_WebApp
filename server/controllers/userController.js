@@ -174,7 +174,6 @@ export const getUser = async (req, res, next) => {
   try {
     const { userId } = req.body.user;
     const { id } = req.params;
-    console.log(id, userId);
     const user = await Users.findById(id ?? userId).populate({
       path: "friends",
       select: "-password",

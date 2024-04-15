@@ -8,8 +8,8 @@ import { useForm } from "react-hook-form";
 import TextInput from "./TextInput";
 import Loading from "./Loading";
 import CustomButton from "./CustomButton";
-import { postComments } from "../assets/data";
-import { apiRequest } from "../utils";
+// import { postComments } from "../assets/data";
+import { apiRequest, likePost } from "../utils";
 
 const getPostComments = async (id) => {
   try {
@@ -67,9 +67,10 @@ const ReplyCard = ({ reply, user, handleLike }) => {
   );
 };
 
-const CommentForm = ({ user, id, replyAt, getComments }) => {
+const CommentForm = ({ user, id, replyAt, getComments, likePost }) => {
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -80,7 +81,6 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
   });
 
   const onSubmit = async (data) => {
-    setPosting(true);
     setErrMsg("");
     try {
       const URL = !replyAt
@@ -166,7 +166,7 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
   );
 };
 
-const PostCard = ({ post, user, deletePost, likePost }) => {
+const PostCard = ({ post, user, deletePost }) => {
   const [showAll, setShowAll] = useState(0);
   const [showReply, setShowReply] = useState(0);
   const [comments, setComments] = useState([]);
@@ -177,14 +177,14 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
   const getComments = async (id) => {
     setReplyComments(0);
     const result = await getPostComments(id);
-    setComments(postComments);
+    setComments(result);
     setLoading(false);
   };
   const handleLike = async (uri) => {
     await likePost(uri);
     await getComments(post?._id);
   };
-
+  console.log(post);
   return (
     <div className="mb-2 bg-primary p-4 rounded-xl">
       <div className="flex gap-3 items-center mb-2">

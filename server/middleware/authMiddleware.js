@@ -5,8 +5,7 @@ const userAuth = async (req, res, next) => {
   if (!authHeader || !authHeader?.startsWith("Bearer")) {
     next("Authentication failed");
   }
-  const token = authHeader?.substring(6);
-  // console.log(token);
+  const token = authHeader?.substring(7);
   try {
     const userToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
     req.body.user = { userId: userToken.userId };

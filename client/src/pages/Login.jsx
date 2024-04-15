@@ -12,7 +12,7 @@ import { UserLogin } from "../redux/userSlice";
 import { apiRequest } from "../utils";
 import { useNavigate } from "react-router-dom";
 const Login = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [errMsg, setErrMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch();
@@ -26,7 +26,6 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
-    
     setIsSubmitting(true);
     try {
       const res = await apiRequest({
@@ -34,18 +33,11 @@ const Login = () => {
         url: "/auth/login",
         data: data,
       });
-
-
-     
       if (res?.status === "failed") {
         setErrMsg(res);
       } else {
         setErrMsg("");
-
-        const data=JSON.parse(res);
-        
-        const newData = { token: data?.token, ...data?.user };
-        
+        const newData = { token: res?.token, ...res?.user };
         dispatch(UserLogin(newData));
         navigate("/");
       }
@@ -55,8 +47,6 @@ const Login = () => {
       console.log("error in login page", error);
     }
   };
-
-
 
   return (
     <div className="bg-bgColor w-full h-[100vh] flex items-center justify-center p-6">

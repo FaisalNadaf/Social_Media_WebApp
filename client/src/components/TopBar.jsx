@@ -10,8 +10,9 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { SetTheme } from "../redux/theme";
 import { Logout } from "../redux/userSlice";
 import { fetchPosts } from "../utils";
-
+import { useNavigate } from "react-router-dom";
 const TopBar = () => {
+  const navigate=useNavigate();
   const { theme } = useSelector((state) => state.theme);
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -30,6 +31,11 @@ const TopBar = () => {
   const handleSearch = async (data) => {
     await fetchPosts(user?.token, dispatch, "", data);
   };
+  const logout=()=>{
+    navigate('/login')
+    dispatch(Logout());
+
+  }
 
   return (
     <div className="topbar w-full flex items-center justify-between py-3 md:py-6 px-4 bg-primary">
@@ -69,7 +75,7 @@ const TopBar = () => {
 
         <div>
           <CustomButton
-            onClick={() => dispatch(Logout())}
+            onClick={() => logout()}
             title="Log Out"
             containerStyles="text-sm text-ascent-1 px-4 md:px-6 py-1 md:py-2 border border-[#666] rounded-full"
           />

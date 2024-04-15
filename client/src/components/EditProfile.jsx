@@ -30,28 +30,25 @@ const EditProfile = () => {
     try {
       const uri = picture && (await handelFileUpload(picture));
       const { firstName, lastName, location, profession } = data;
-      console.log(user);
       const res = await apiRequest({
         method: "PUT",
         url: "/users/update-user",
         data: {
           firstName,
           lastName,
-          location, 
+          location,
           profession,
           profileUrl: uri ? uri : user?.profileUrl,
         },
         token: user?.token,
       });
-      console.log(res);
 
-      console.log(res);
       if (res?.status === "failed") {
         setErrMsg(res);
       } else {
         const newUser = { token: res?.token, ...res?.user };
 
-        // dispatch(UserLogin(newUser));
+        dispatch(UserLogin(newUser));
 
         setTimeout(() => {
           dispatch(UpdateProfile(false));

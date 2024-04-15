@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { user } from "../assets/data";
 
 const initialState = {
-  user:  {},
+  user: {},
   edit: false,
 };
 
@@ -11,8 +11,10 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     login(state, action) {
-      state.user = action.payload;
-      localStorage.setItem("user",JSON.stringify(action.payload));
+      if (action.payload.firstName) {
+        state.user = action.payload;
+        localStorage.setItem("user", JSON.stringify(state.user));
+      }
     },
     logout(state) {
       state.user = null;
@@ -21,19 +23,21 @@ const userSlice = createSlice({
     updateProfile(state, action) {
       state.edit = action.payload;
     },
+   
   },
 });
 export default userSlice.reducer;
 
 export function UserLogin(user) {
   return (dispatch, getState) => {
-    dispatch(userSlice.actions.login( user ));
+    dispatch(userSlice.actions.login(user));
   };
 }
 
 export function Logout() {
   return (dispatch, getState) => {
     dispatch(userSlice.actions.logout());
+    
   };
 }
 
