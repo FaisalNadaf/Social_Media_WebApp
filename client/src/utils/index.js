@@ -1,5 +1,5 @@
 import axios from "axios";
-import { SetPosts } from "../redux/postSlice";
+import { SetPosts } from "../redux/postSlice.js";
 
 const API_URL = "http://localhost:8800";
 
@@ -19,6 +19,7 @@ export const apiRequest = async ({ url, token, data, method }) => {
       data: data,
       withCredentials: true,
     });
+
     const newdata = result?.data;
 
     return JSON.parse(newdata);
@@ -29,27 +30,65 @@ export const apiRequest = async ({ url, token, data, method }) => {
   }
 };
 
+// export const handelFileUpload = async (uploadFile) => {
+//   const formData = new FormData();
+//   formData.append("file", uploadFile);
+//   formData.append("upload_present", "MEkMATE");
+
+//   console.log(uploadFile);
+//   console.log(formData);
+
+//   try {
+//     const cloudName = process.env.CLOUD_NAME; // Check if CLOUD_NAME is properly set
+
+//     if (!cloudName) {
+//       throw new Error("CLOUD_NAME environment variable is not set.");
+//     }
+
+//     const response = await axios.post(
+//       `https://api.cloudinary.com/v1_1/${cloudName}/image/upload/`,
+//       formData
+//     );
+
+//     console.log(response);
+
+//     return response.data.secure_url;
+//   } catch (error) {
+//     console.error("Upload error:", error.message);
+//     throw error; // Rethrow the error to handle it elsewhere
+//   }
+// };
+
 export const handelFileUpload = async (uploadFile) => {
-  const formData = new FormData();
-  formData.append("file", uploadFile);
-  formData.append("upload_present", "MEkMATE");
-
   try {
-    const cloudName = "dcacqhspd"; // Check if CLOUD_NAME is properly set
+    const formData = new FormData();
+    formData.append("file", uploadFile);
+    formData.append("upload_preset", "MEkMATE"); // Corrected spelling of "upload_preset"
 
+    console.log(uploadFile);
+    console.log(formData);
+
+    const cloudName = 'dcacqhspd'; // Check if CLOUD_NAME is properly set
+    console.log(cloudName);
     if (!cloudName) {
       throw new Error("CLOUD_NAME environment variable is not set.");
     }
 
     const response = await axios.post(
-      `https://api.cloudinary.com/v1_1/dcacqhspd/image/upload/`,
-      formData
+      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload/`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data", // Set content type explicitly for FormData
+        },
+      }
     );
 
-    console.log("Uploaded URL:", response.data.secure_url);
+    console.log(response.data.secure_url); // Log response data
+
     return response.data.secure_url;
   } catch (error) {
-    console.error("Upload error:", error);
+    console.error("Upload error:", error.message);
     throw error; // Rethrow the error to handle it elsewhere
   }
 };
@@ -69,20 +108,20 @@ export const fetchPosts = async (token, dispatch, uri, data) => {
   }
 };
 
-export const likePost = async ({ token, uri }) => {
+export const likePost = async (token, uri) => {
   try {
     const res = await apiRequest({
       url: uri,
       token: token,
       method: "POST",
     });
-    return res;
+    return res?.data;
   } catch (error) {
     console.log("error in like posts utils client :", error);
   }
 };
 
-export const deletePost = async ({ token, id }) => {
+export const deletePost = async (token, id) => {
   try {
     const res = await apiRequest({
       url: "/posts/" + id,
@@ -116,7 +155,7 @@ export const getUserInfo = async (token, id) => {
   }
 };
 
-export const sendFriendRequest = async ( token, id ) => {
+export const sendFriendRequest = async (token, id) => {
   try {
     const res = await apiRequest({
       url: "/users/friend-request",

@@ -6,7 +6,7 @@ import TextInput from "./TextInput";
 import Loading from "./Loading";
 import CustomButton from "./CustomButton";
 import { UpdateProfile, UserLogin } from "../redux/userSlice";
-import { apiRequest, handelFileUpload } from "../utils";
+import { apiRequest, fetchPosts, handelFileUpload } from "../utils";
 
 const EditProfile = () => {
   const { user } = useSelector((state) => state.user);
@@ -23,6 +23,10 @@ const EditProfile = () => {
     mode: "onChange",
     defaultValues: { ...user },
   });
+
+  const fetchPost = async () => {
+    await fetchPosts(user?.token, dispatch);
+  };
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
@@ -52,8 +56,9 @@ const EditProfile = () => {
 
         setTimeout(() => {
           dispatch(UpdateProfile(false));
-        }, 3000);
+        }, 2000);
         setErrMsg("");
+        await fetchPost();
       }
       setIsSubmitting(false);
     } catch (error) {

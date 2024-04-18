@@ -4,8 +4,8 @@ import Users from "../models/userModel.js";
 
 export const createPost = async (req, res, next) => {
   try {
-    // const { userId } = req.body.user;
-    const userId = req.body.user?._id;
+    const { userId } = req.body.user;
+    // const userId = req.body.user?._id;
     const { description, image } = req.body;
 
     if (!description) {
@@ -53,8 +53,6 @@ export const getPosts = async (req, res, next) => {
         select: "firstName lastName location profileUrl -password",
       })
       .sort({ _id: -1 });
-
-    console.log(posts);
 
     const friendsPosts = posts?.filter((post) => {
       return friends.includes(post?.userId?._id.toString());
@@ -112,7 +110,6 @@ export const getPost = async (req, res, next) => {
 
     res.status(200).json({
       sucess: true,
-
       message: "successfully",
       data: post,
     });
@@ -174,9 +171,7 @@ export const likePost = async (req, res, next) => {
   try {
     const { userId } = req.body.user;
     const { id } = req.params;
-
     const post = await Posts.findById(id);
-
     const index = post.likes.findIndex((pid) => pid === String(userId));
 
     if (index === -1) {
@@ -188,6 +183,7 @@ export const likePost = async (req, res, next) => {
     const newPost = await Posts.findByIdAndUpdate(id, post, {
       new: true,
     });
+
 
     res.status(200).json({
       sucess: true,

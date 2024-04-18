@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { NoProfile } from "../assets";
@@ -9,7 +9,9 @@ import TextInput from "./TextInput";
 import Loading from "./Loading";
 import CustomButton from "./CustomButton";
 // import { postComments } from "../assets/data";
-import { apiRequest, likePost } from "../utils";
+import { apiRequest, deletePost, fetchPosts, likePost } from "../utils";
+import { updateComments } from "../redux/postSlice";
+import { useDispatch } from "react-redux";
 
 const getPostComments = async (id) => {
   try {
@@ -67,9 +69,11 @@ const ReplyCard = ({ reply, user, handleLike }) => {
   );
 };
 
-const CommentForm = ({ user, id, replyAt, getComments, likePost }) => {
+const CommentForm = ({ user, id, replyAt, getComments }) => {
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -79,6 +83,15 @@ const CommentForm = ({ user, id, replyAt, getComments, likePost }) => {
   } = useForm({
     mode: "onChange",
   });
+
+  const fetchPost = async () => {
+    await fetchPosts(user?.token, dispatch);
+  };
+
+  const handleLike = async (uri) => {
+    await likePost(user?.token, uri);
+    // await getComments(post?._id);
+  };
 
   const onSubmit = async (data) => {
     setErrMsg("");
@@ -98,7 +111,7 @@ const CommentForm = ({ user, id, replyAt, getComments, likePost }) => {
         data: newData,
         token: user?.token,
       });
-      console.log(res);
+
       if (res?.status === "failed") {
         setErrMsg(res);
       } else {
@@ -106,12 +119,14 @@ const CommentForm = ({ user, id, replyAt, getComments, likePost }) => {
           comment: "",
         });
         setErrMsg("");
-        setFile(null);
+        // await updateComments({postId:res.postId,comment:res});
         await getComments();
+        await handleLike();
+        await fetchPost();
       }
       setLoading(false);
     } catch (error) {
-      console.log("error in postcard.jsx :", error);
+      console.log("error in postcard.jsx :", error.message);
       setLoading(false);
     }
   };
@@ -166,13 +181,14 @@ const CommentForm = ({ user, id, replyAt, getComments, likePost }) => {
   );
 };
 
-const PostCard = ({ post, user, deletePost }) => {
+const PostCard = ({ post, user }) => {
   const [showAll, setShowAll] = useState(0);
   const [showReply, setShowReply] = useState(0);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [replyComments, setReplyComments] = useState(0);
   const [showComments, setShowComments] = useState(0);
+  const dispatch = useDispatch();
 
   const getComments = async (id) => {
     setReplyComments(0);
@@ -180,11 +196,22 @@ const PostCard = ({ post, user, deletePost }) => {
     setComments(result);
     setLoading(false);
   };
-  const handleLike = async (uri) => {
-    await likePost(uri);
-    await getComments(post?._id);
+
+  const handelDelete = async (token, id) => { 
+    await deletePost(token, id);
+    await fetchPost();
   };
-  console.log(post);
+
+  const fetchPost = async () => {
+    await fetchPosts(user?.token, dispatch);
+  };
+
+  const handleLike = async (uri) => {
+    await likePost(user?.token, uri);
+    await getComments(post?._id);
+    await fetchPost();
+  };
+
   return (
     <div className="mb-2 bg-primary p-4 rounded-xl">
       <div className="flex gap-3 items-center mb-2">
@@ -252,7 +279,12 @@ const PostCard = ({ post, user, deletePost }) => {
         className="mt-4 flex justify-between items-center px-3 py-2 text-ascent-2
       text-base border-t border-[#66666645]"
       >
-        <p className="flex gap-2 items-center text-base cursor-pointer">
+        <p
+          className="flex gap-2 items-center text-base cursor-pointer"
+          onClick={() => {
+            handleLike("/posts/like/" + post?._id);
+          }}
+        >
           {post?.likes?.includes(user?._id) ? (
             <BiSolidLike size={20} color="blue" />
           ) : (
@@ -275,7 +307,7 @@ const PostCard = ({ post, user, deletePost }) => {
         {user?._id === post?.userId?._id && (
           <div
             className="flex gap-1 items-center text-base text-ascent-1 cursor-pointer"
-            onClick={() => deletePost(post?._id)}
+            onClick={() => handelDelete(user?.token, post?._id)}
           >
             <MdOutlineDeleteOutline size={20} />
             <span>Delete</span>

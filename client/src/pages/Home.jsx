@@ -18,7 +18,6 @@ import { BiImages, BiSolidVideo } from "react-icons/bi";
 import { set, useForm } from "react-hook-form";
 import {
   apiRequest,
-  deletePost,
   fetchPosts,
   getUserInfo,
   handelFileUpload,
@@ -65,8 +64,8 @@ const Home = () => {
         reset({
           description: "",
         });
-        setErrMsg("");
         setFile(null);
+        setErrMsg("");
         await fetchPost();
       }
       setPosting(false);
@@ -81,10 +80,6 @@ const Home = () => {
   };
   const handelLikePost = async (uri) => {
     await likePost({ uri: uri, token: user?.token });
-    await fetchPost();
-  };
-  const handelDelete = async (id) => {
-    await deletePost(id, user?.token);
     await fetchPost();
   };
   const fetchFrienduesReqests = async () => {
@@ -144,6 +139,7 @@ const Home = () => {
     fetchPost();
     setLoading(true);
   }, []);
+
   return (
     <>
       <div className="w-full px-0 lg:px-10 pb-20 2xl:px-40 bg-bgColor lg:rounded-lg h-screen overflow-hidden">
@@ -198,7 +194,7 @@ const Home = () => {
                 >
                   <input
                     type="file"
-                    onChange={(e) => setFile(e.target.files[0])}
+                    onClick={(e) => setFile(e.target.files[0])}
                     className="hidden"
                     id="imgUpload"
                     data-max-size="5120"
@@ -215,7 +211,7 @@ const Home = () => {
                   <input
                     type="file"
                     data-max-size="5120"
-                    onChange={(e) => setFile(e.target.files[0])}
+                    onClick={(e) => setFile(e.target.files[0])}
                     className="hidden"
                     id="videoUpload"
                     accept=".mp4, .wav"
@@ -231,7 +227,7 @@ const Home = () => {
                   <input
                     type="file"
                     data-max-size="5120"
-                    onChange={(e) => setFile(e.target.files[0])}
+                    onClick={(e) => setFile(e.target.files[0])}
                     className="hidden"
                     id="vgifUpload"
                     accept=".gif"
@@ -263,7 +259,7 @@ const Home = () => {
                   post={post}
                   user={user}
                   deletePost={() => {
-                    handelDelete;
+                    handelDelete();
                   }}
                   likePost={() => {
                     handelLikePost;
