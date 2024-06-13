@@ -9,7 +9,7 @@ import { UpdateProfile, UserLogin } from "../redux/userSlice";
 import { apiRequest, fetchPosts, handelFileUpload } from "../utils";
 
 const EditProfile = () => {
-  const { user } = useSelector((state) => state.user);
+  const  {user}  = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [errMsg, setErrMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
