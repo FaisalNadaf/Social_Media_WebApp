@@ -3,7 +3,6 @@
 import axios from "axios";
 import { SetPosts } from "../redux/postSlice.js";
 
-// const API_URL = "https://socialmediawebapp-0ypz.onrender.com";
 const API_URL = "http://localhost:8800";
 
 export const API = axios.create({

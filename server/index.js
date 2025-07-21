@@ -29,8 +29,8 @@ dbConnection();
 app.use(helmet());
 app.use(
 	cors({
-		// origin: "https://faisal-socialmedia.netlify.app",
-		origin: "http://localhost:3000",
+		origin: "https://faisal-socialmedia.netlify.app",
+		// origin: "http://localhost:3000",
 		credentials: true,
 	}),
 );
