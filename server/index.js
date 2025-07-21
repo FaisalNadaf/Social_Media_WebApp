@@ -1,9 +1,13 @@
+/** @format */
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import bodyParser from "body-parser";
 import path from "path";
+
+import { app, server } from "./socket/socket.js";
 
 //-------------------------------security packages--------------------------------------
 import helmet from "helmet";
@@ -15,7 +19,7 @@ const __dirname = path.resolve(path.dirname(""));
 
 dotenv.config();
 
-const app = express();
+// const app = express();
 
 app.use(express.static(path.join(__dirname, "views/build")));
 
@@ -24,10 +28,11 @@ dbConnection();
 
 app.use(helmet());
 app.use(
-  cors({
-    origin: "https://faisal-socialmedia.netlify.app",
-    credentials: true,
-  })
+	cors({
+		// origin: "https://faisal-socialmedia.netlify.app",
+		origin: "http://localhost:3000",
+		credentials: true,
+	}),
 );
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
@@ -37,6 +42,6 @@ app.use(morgan("dev"));
 app.use(router);
 app.use(errorMiddleware);
 
-app.listen(PORT, () => {
-  console.log(`server started on port : ${PORT}`);
+server.listen(PORT, () => {
+	console.log(`server started on port : ${PORT}`);
 });
