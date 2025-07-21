@@ -1,48 +1,50 @@
 /** @format */
-
 import useListenMessages from "../../hooks/useListenMessages.js";
 import MessageSkeleton from "../skeletons/MessageSkeleton.jsx";
 import Message from "./Message";
-import React, { useEffect, useRef } from "react";
-
+import React, { useEffect, useRef, useState } from "react";
 import useGetMessages from "../../hooks/useGetMesages.js";
 
 const Messages = () => {
-  console.log(
-    "--------------------------------------------------------------------------",
-  );
-console.log("CALL MESSAGE FUNCTION")
-  console.log(
-    "--------------------------------------------------------------------------",
-  );
 	const { messages, loading } = useGetMessages();
-	const lastMessageRef = useRef();
+	const messagesEndRef = useRef(null);
+	const [prevMessagesLength, setPrevMessagesLength] = useState(0);
 
 	useListenMessages();
-	// console.log("messages : ", messages.message);
+
 	useEffect(() => {
-		setTimeout(() => {
-			lastMessageRef.current?.scrollIntoView({
+		// Only scroll if new messages were added (not on initial load)
+		if (messages.length > prevMessagesLength && messages.length > 0) {
+			messagesEndRef.current?.scrollIntoView({
 				behavior: "smooth",
+				block: "nearest",
 			});
-		}, 50);
-	}, [messages]);
+		}
+		setPrevMessagesLength(messages.length);
+	}, [messages.length]); // Only trigger on length changes
 
 	return (
-		<div className="px-4 flex-1 overflow-auto h-full ">
+		<div className="px-4 flex-1 overflow-auto">
 			{!loading &&
 				messages.length > 0 &&
 				messages.map((message) => (
-					<div
+					<Message
 						key={message._id}
-						ref={lastMessageRef}>
-						<Message message={message} />
-					</div>
+						message={message}
+					/>
 				))}
+
 			{loading && [...Array(5)].map((_, idx) => <MessageSkeleton key={idx} />)}
+
 			{!loading && messages.length === 0 && (
-				<p className="text-center "> Send a message to start conversation</p>
+				<p className="text-center">Send a message to start conversation</p>
 			)}
+
+			{/* More subtle scroll marker */}
+			<div
+				ref={messagesEndRef}
+				className="h-px"
+			/>
 		</div>
 	);
 };

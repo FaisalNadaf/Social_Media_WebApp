@@ -15,17 +15,15 @@ export const SocketContextProvider = ({ children }) => {
 	const [onlineUsers, setOnlineUsers] = useState([]);
 	const authUser = JSON.parse(localStorage.getItem("user"));
 
+	console.log("authUser", authUser);
+
 	useEffect(() => {
 		if (authUser) {
-			const socket = io(
-				"http://localhost:8800",
-				{
-					query: {
-						userId: authUser.userId,
-					},
+			const socket = io("http://localhost:8800", {
+				query: {
+					userId: authUser._id,
 				},
-			
-			);
+			});
 
 			setSocket(socket);
 

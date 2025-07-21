@@ -9,16 +9,23 @@ const useGetMessages = () => {
 	const [loading, setLoading] = useState(false);
 	const { messages, setMessages } = useConversation();
 	const { id } = useParams();
+	let token = null;
+	try {
+		token = JSON.parse(localStorage.getItem("user")).token;
+	} catch (e) {
+		token = null;
+	}
 
-	console.log("getchatId", id);
-	console.log("GETTING MESSEGESSSSS");
 	useEffect(() => {
 		const getMessages = async () => {
 			setLoading(true);
 			try {
-				const res = await fetch(`http://localhost:8800/chat/${id}`);
+				const res = await fetch(`http://localhost:8800/chat/${id}`, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				});
 				const data = await res.json();
-				console.log("data", data);
 				if (data.error) throw new Error(data.error);
 				setMessages(data);
 			} catch (error) {

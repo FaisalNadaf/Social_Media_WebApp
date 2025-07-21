@@ -7,9 +7,7 @@ export const sendMessage = async (req, res) => {
 	try {
 		const { message } = req.body;
 		const { id: receiverId } = req.params;
-		const senderId = req.user.userId;
-		// const  receiverId  = "686fd15f37c257737a2473c2";
-		// const senderId = "6879e96bade29a42990d0f56";
+		const senderId = req.body.user.userId;
 
 		let conversation = await Conversation.findOne({
 			participants: { $all: [senderId, receiverId] },
@@ -31,9 +29,6 @@ export const sendMessage = async (req, res) => {
 			conversation.messages.push(newMessage._id);
 		}
 
-		// await conversation.save();
-		// await newMessage.save();
-
 		await Promise.all([conversation.save(), newMessage.save()]);
 
 		// socker io functionality
@@ -51,10 +46,9 @@ export const sendMessage = async (req, res) => {
 };
 
 export const getMessages = async (req, res) => {
-	console.log("REQUEST RECEIVED", req);
 	try {
 		const { id: userToChatId } = req.params;
-		const senderId = req.user.userId;
+		const senderId = req.body.user.userId;
 
 		const conversation = await Conversation.findOne({
 			participants: { $all: [senderId, userToChatId] },

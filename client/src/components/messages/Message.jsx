@@ -9,12 +9,24 @@ import { useParams } from "react-router-dom";
 const Message = ({ message }) => {
 	const authUser = JSON.parse(localStorage.getItem("user"));
 	const { id } = useParams();
-	const chatUser = getUserInfo(authUser.token, id);
+
+	const [chatUser, setChatUser] = React.useState(null);
+
+	React.useEffect(() => {
+		let isMounted = true;
+		getUserInfo(authUser.token, id).then((user) => {
+			if (isMounted) setChatUser(user);
+		});
+		return () => {
+			isMounted = false;
+		};
+	}, [authUser.token, id]);
 	const { selectedConversation } = useConversation();
-	const fromMe = message.senderId === authUser.userId;
+	const fromMe = message.senderId === authUser._id;
+
 	const formattedTime = extractTime(message.createdAt);
 	const chatClassName = fromMe ? "chat-end" : "chat-start";
-	const profilePic = fromMe ? authUser.profilePic : chatUser.profilePic;
+	const profilePic = fromMe ? authUser.profileUrl : chatUser?.profileUrl;
 	const bubbleBgColor = fromMe ? "bg-blue-500" : "";
 
 	const shakeClass = message.shouldShake ? "shake" : "";
@@ -32,13 +44,11 @@ const Message = ({ message }) => {
 						/>
 					</div>
 				</div>
-				<div
-					className={`chat-bubble text-white ${bubbleBgColor} ${shakeClass} p-2`}>
-					{message.message}
+				<div className="chat-header">
+					{fromMe ? authUser.firstName : chatUser?.firstName}
+					<time className="text-xs opacity-50">{formattedTime}</time>
 				</div>
-				<div className="chat-footer opacity-50 text-xs flex gap-1 items-center">
-					{formattedTime}
-				</div>
+				<div className="chat-bubble">{message.message}</div>
 			</div>
 		</>
 	);

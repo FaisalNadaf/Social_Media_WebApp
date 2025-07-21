@@ -1,6 +1,7 @@
 import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Home, Login, Profile, Register, ResetPassword } from "./pages";
+import Chat from "./pages/Chat";
 
 
 function Layout() {
@@ -26,6 +27,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/profile/:id?" element={<Profile />} />
+          <Route path="/chat/:id?" element={<Chat />} />
         </Route>
 
         <Route path="/register" element={<Register />} />

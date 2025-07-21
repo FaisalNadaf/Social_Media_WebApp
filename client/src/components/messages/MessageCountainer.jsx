@@ -34,7 +34,7 @@ const MessageCountainer = () => {
 	}, [setSelectedConversation]);
 
 	return (
-		<div className="w-full h-full  md:min-w-[450px] flex flex-col">
+		<div className="w-full max-h-[550px] md:min-h-[550px]  md:min-w-[450px] flex flex-col">
 			<>
 				<div className="bg-slate-500 px-4 py-2 mb-2 flex justify-between items-center ">
 					<div className="flex items-center gap-2">
