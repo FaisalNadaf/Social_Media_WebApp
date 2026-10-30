@@ -1,3 +1,5 @@
+/** @format */
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -24,10 +26,11 @@ dbConnection();
 
 app.use(helmet());
 app.use(
-  cors({
-    origin: "https://faisal-socialmedia.netlify.app",
-    credentials: true,
-  })
+	cors({
+		// origin: "https://faisal-socialmedia.netlify.app",
+		origin: "http://localhost:3000",
+		credentials: true,
+	}),
 );
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
@@ -38,5 +41,5 @@ app.use(router);
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
-  console.log(`server started on port : ${PORT}`);
+	console.log(`server started on port : ${PORT}`);
 });

@@ -1,8 +1,8 @@
 import axios from "axios";
 import { SetPosts } from "../redux/postSlice.js";
 
-const API_URL = "https://socialmediawebapp-0ypz.onrender.com";
-// const API_URL = "http://localhost:8800";
+// const API_URL = "https://socialmediawebapp-0ypz.onrender.com";
+const API_URL = "http://localhost:8800";
 
 
 export const API = axios.create({
@@ -30,7 +30,7 @@ export const apiRequest = async ({ url, token, data, method }) => {
     // const err = error.data;
     console.log(error);
   }
-};
+};  
 
 // export const handelFileUpload = async (uploadFile) => {
 //   const formData = new FormData();
